@@ -20,6 +20,7 @@ class AqiStudy():
         time.sleep(0.5)
         html = self._browser.page_source
         soup = BeautifulSoup(html, 'lxml')
+        
         return soup
     
     
@@ -31,7 +32,20 @@ class AqiStudy():
         for li in city_soup:
             city = li.a.string.strip()
             citylist.append(city)
+            
         return citylist
+    
+    
+    # 爬取主要城市列表
+    def get_maincity(self):
+        maincity = []
+        maincity_url = 'https://www.aqistudy.cn/historydata/'
+        maincity_soup = self.open_web(maincity_url).find_all('ul', class_="unstyled")[-1].find_all('li')
+        for li in maincity_soup:
+            city = li.a.string.strip()
+            maincity.append(city)
+            
+        return maincity
     
     
     # 爬取月份列表
@@ -43,23 +57,22 @@ class AqiStudy():
             month_str = li.a.string.strip()
             month = f'{month_str[:4]}-{month_str[5:-1]}'
             monthlist.append(month)
+            
         return monthlist
     
     
     # 创建保存图片的文件夹
-    def create_folder(self, cwd):
-        os.chdir(cwd)
-        if not os.path.exists('AQI'):
-            os.mkdir('AQI')
-        os.chdir('AQI')
+    def create_folder(self):
+        if not os.path.exists('AQIdata'):
+            os.mkdir('AQIdata')
+        os.chdir('AQIdata')
     
     
     def main(self):
         print('爬虫程序启动')
-        monthlist = self.get_month()
-        citylist = self.get_city()
-        current_cwd = os.getcwd()
-        self.create_folder(current_cwd)
+        monthlist = self.get_month()[1:61]
+        citylist = self.get_maincity()
+        self.create_folder()
         
         for city in citylist:
             #设置表头#
@@ -72,7 +85,10 @@ class AqiStudy():
             for month in monthlist:
                 url = f'https://www.aqistudy.cn/historydata/daydata.php?city={city}&month={month}'
                 soup = self.open_web(url)
-                table = soup.find('table').find_all('tr')[1:]
+                table = soup.find('tbody').find_all('tr')[1:]
+                while not table:  # 判断页面是否完全刷新
+                    soup = self.open_web(url)
+                    table = soup.find('tbody').find_all('tr')[1:]
                 for tr in table:
                     tds = tr.find_all('td')
                     data = []

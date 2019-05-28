@@ -86,7 +86,7 @@ class AqiStudy():
                 url = f'https://www.aqistudy.cn/historydata/daydata.php?city={city}&month={month}'
                 soup = self.open_web(url)
                 table = soup.find('tbody').find_all('tr')[1:]
-                while not table:  # 判断页面是否完全刷新
+                while not table:  # 判断页面是否完全加载
                     soup = self.open_web(url)
                     table = soup.find('tbody').find_all('tr')[1:]
                 for tr in table:

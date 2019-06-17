@@ -77,7 +77,7 @@ class AqiStudy():
         for city in citylist:
             #设置表头#
             heads = ['date', 'AQI', '质量等级', 'PM2.5', 'PM10', 'SO2', 'CO', 'NO2', 'O3_8h']
-            with open(f'{city}.csv', 'w', newline='') as f:
+            with open(f'{city}.csv', 'w', newline='', encoding='utf-8') as f:
                 f_csv = csv.writer(f)
                 f_csv.writerow(heads)
             print(f'正在爬取{city}的空气质量数据...')
@@ -94,7 +94,7 @@ class AqiStudy():
                     data = []
                     for i in tds:
                         data.append(i.string)
-                    with open(f'{city}.csv', 'a', newline='') as f:
+                    with open(f'{city}.csv', 'a', newline='', encoding='utf-8') as f:
                         f_csv = csv.writer(f)
                         f_csv.writerow(data)
             print(f'{city}数据爬取完毕')
